@@ -6,13 +6,15 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
+use TelegramBot\Api\Client;
 
 $telegramToken = getenv('TELEGRAM_TOKEN');
 $spotifyToken = getenv('SPOTIFY_TOKEN');
 
 $bot = new botApi($telegramToken);
+$client = new Client($telegramToken);
 
-$bot->command('start', function (Message $message, $code) use ($bot) {
+$client->command('start', function (Message $message, $code) use ($bot) {
    $bot->sendMessage(
        $message->getChat()->getId(),
        'Welcome to Spotify Music Bot!',
@@ -27,7 +29,7 @@ $bot->command('start', function (Message $message, $code) use ($bot) {
    );
 });
 
-$bot->on(function (Update $update) use ($bot) {
+$client->on(function (Update $update) use ($bot) {
    $message = $update->getMessage();
    $id = $message->getChat()->getId();
    $bot->sendMessage($id, 'Your message: ' . $message->getText());
@@ -35,4 +37,4 @@ $bot->on(function (Update $update) use ($bot) {
     return true;
 });
 
-$bot->run();
+$client->run();
