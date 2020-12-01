@@ -6,17 +6,27 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use TelegramBot\Api\Client;
+use SpotifyWebAPI\Session;
+use SpotifyWebAPI\SpotifyWebAPI;
 
 $telegramToken = getenv('TELEGRAM_TOKEN');
-$spotifyToken = getenv('SPOTIFY_TOKEN');
+$spotifyClientId = getenv('SPOTIFY_CLIENT_ID');
+$spotifyClientSecret = getenv('SPOTIFY_CLIENT_SECRET');
 
 $bot = new botApi($telegramToken);
 $client = new Client($telegramToken);
+$spotify = new Session($spotifyClientId, $spotifyClientSecret);
+$spotify->requestCredentialsToken();
+$spotifyApi = new SpotifyWebAPI();
+$spotifyApi->setAccessToken($spotify->getAccessToken());
 
-$client->command('getrandomtopsong', function (Message $message) use ($bot) {
+$client->command('getrandomtopsong', function (Message $message) use ($bot, $spotifyApi) {
+    $playlist = $spotifyApi->getPlaylistTracks('37i9dQZEVXbMDoHDwVN2tF');
+    file_put_contents("php://stderr", serialize($playlist));
+
     $bot->sendMessage(
         $message->getChat()->getId(),
-        'Some text'
+        'Test'
     );
 });
 
