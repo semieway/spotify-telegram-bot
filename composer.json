@@ -1,0 +1,12 @@
+{
+    "name": "semieway/spotifymusicbot",
+    "description": "Spotify bot for telegram",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Alex Sirotin",
+            "email": "semieway@gmail.com"
+        }
+    ],
+    "require": {}
+}
