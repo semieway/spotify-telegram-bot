@@ -22,11 +22,12 @@ $spotifyApi->setAccessToken($spotify->getAccessToken());
 
 $client->command('getrandomtopsong', function (Message $message) use ($bot, $spotifyApi) {
     $playlist = $spotifyApi->getPlaylistTracks('37i9dQZEVXbMDoHDwVN2tF');
-    file_put_contents("php://stderr", serialize($playlist));
+    $randomInt = rand(0, 49);
+    $trackUrl = $playlist->items[$randomInt]->track->external_urls->spotify;
 
     $bot->sendMessage(
         $message->getChat()->getId(),
-        'Test'
+        $trackUrl
     );
 });
 
