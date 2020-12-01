@@ -8,5 +8,7 @@
             "email": "semieway@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "telegram-bot/api": "^2.3"
+    }
 }
