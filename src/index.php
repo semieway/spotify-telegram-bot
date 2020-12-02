@@ -9,10 +9,12 @@ use TelegramBot\Api\Client;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
 
+/* Tokens. */
 $telegramToken = getenv('TELEGRAM_TOKEN');
 $spotifyClientId = getenv('SPOTIFY_CLIENT_ID');
 $spotifyClientSecret = getenv('SPOTIFY_CLIENT_SECRET');
 
+/* Initialize clients */
 $bot = new botApi($telegramToken);
 $client = new Client($telegramToken);
 $spotify = new Session($spotifyClientId, $spotifyClientSecret);
@@ -20,6 +22,7 @@ $spotify->requestCredentialsToken();
 $spotifyApi = new SpotifyWebAPI();
 $spotifyApi->setAccessToken($spotify->getAccessToken());
 
+/* /top %country% command */
 $client->command('top', function (Message $message) use ($bot, $spotifyApi) {
     $playlist = $spotifyApi->search($message->getText() . ' top 50 chart', 'playlist', ['limit' => 1]);
     $playlistId = $playlist->playlists->items[0]->id;
@@ -41,6 +44,7 @@ $client->command('top', function (Message $message) use ($bot, $spotifyApi) {
     );
 });
 
+/* /start command */
 $client->command('start', function (Message $message) use ($bot) {
    $bot->sendMessage(
        $message->getChat()->getId(),
@@ -48,6 +52,7 @@ $client->command('start', function (Message $message) use ($bot) {
    );
 });
 
+/* Any messages other than commands */
 $client->on(function (Update $update) use ($bot) {
     $message = $update->getMessage();
     $id = $message->getChat()->getId();
@@ -56,6 +61,7 @@ $client->on(function (Update $update) use ($bot) {
     return true;
 });
 
+/* Send response to bot */
 try {
     $client->run();
 } catch (\TelegramBot\Api\InvalidJsonException $e) {
