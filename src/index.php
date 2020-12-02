@@ -114,6 +114,21 @@ try {
         );
     });
 
+    /* /randomalbum command */
+    $client->command('randomalbum', function (Message $message) use ($bot, $spotifyApi, $genres) {
+       $album = $spotifyApi->getRecommendations([
+           'limit' => 1,
+           'seed_genres' => [$genres[array_rand($genres, 1)]],
+           'min_popularity' => 50,
+       ]);
+       $albumLink = $album->tracks[0]->album->external_urls->spotify;
+
+        $bot->sendMessage(
+            $message->getChat()->getId(),
+            $albumLink
+        );
+    });
+
     /* /start command */
     $client->command('start', function (Message $message) use ($bot) {
         $bot->sendMessage(
@@ -126,7 +141,7 @@ try {
     $client->on(function (Update $update) use ($bot) {
         $message = $update->getMessage();
         $id = $message->getChat()->getId();
-        $bot->sendMessage($id, 'Please try to use commands, for example /top global');
+        $bot->sendMessage($id, 'Please try to use commands, for example /randomsong');
     }, function () {
         return true;
     });
