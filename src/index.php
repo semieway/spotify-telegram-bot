@@ -29,7 +29,7 @@ try {
         $playlistId = $playlist->playlists->items[0]->id;
         $songs = $spotifyApi->getPlaylistTracks($playlistId);
 
-        $result = sprintf("<b>%s:</b>\n\n", $playlist->playlists->items[0]->name);
+        $result = sprintf("<b>%s:</b>\n", $playlist->playlists->items[0]->name);
         foreach ($songs->items as $key => $item) {
             $artists = array_map(fn($artist) => $artist->name, $item->track->artists);
             $artists = join(', ', $artists);
@@ -78,11 +78,31 @@ try {
         );
     });
 
+    /* /newreleases command */
+    $client->command('newreleases', function (Message $message) use ($bot, $spotifyApi) {
+       $releases = $spotifyApi->getNewReleases(['country' => 'US', 'limit' => 10]);
+       $result = "<b>Latest releases:</b>\n";
+
+       foreach ($releases->albums->items as $release) {
+           $artists = array_map(fn($artist) => $artist->name, $release->artists);
+           $artists = join(', ', $artists);
+           $temp = sprintf("<a href=\"%s\">• %s – %s</a>\n", $release->external_urls->spotify, $artists, $release->name);
+           $result .= $temp;
+       }
+
+       $bot->sendMessage(
+           $message->getChat()->getId(),
+           $result,
+           'HTML',
+           true
+       );
+    });
+
     /* /start command */
     $client->command('start', function (Message $message) use ($bot) {
         $bot->sendMessage(
             $message->getChat()->getId(),
-            'Welcome to Spotify Music bot! Use /getrandomtopsong, for example'
+            'Welcome to Spotify Music bot!'
         );
     });
 
@@ -90,7 +110,7 @@ try {
     $client->on(function (Update $update) use ($bot) {
         $message = $update->getMessage();
         $id = $message->getChat()->getId();
-        $bot->sendMessage($id, 'Please try to use commands, for example /getrandomtopsong');
+        $bot->sendMessage($id, 'Please try to use commands, for example /top global');
     }, function () {
         return true;
     });
