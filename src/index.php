@@ -20,14 +20,24 @@ $spotify->requestCredentialsToken();
 $spotifyApi = new SpotifyWebAPI();
 $spotifyApi->setAccessToken($spotify->getAccessToken());
 
-$client->command('getrandomtopsong', function (Message $message) use ($bot, $spotifyApi) {
-    $playlist = $spotifyApi->getPlaylistTracks('37i9dQZEVXbMDoHDwVN2tF');
-    $randomInt = rand(0, 49);
-    $trackUrl = $playlist->items[$randomInt]->track->external_urls->spotify;
+$client->command('top', function (Message $message) use ($bot, $spotifyApi) {
+    $playlist = $spotifyApi->search($message->getText() . ' top 50 chart', 'playlist', ['limit' => 1]);
+    $playlistId = $playlist->playlists->items[0]->id;
+    $songs = $spotifyApi->getPlaylistTracks($playlistId);
+
+    $result = sprintf("<b>%s:</b>\n\n", $playlist->playlists->items[0]->name);
+    foreach ($songs->items as $key => $item) {
+        $artists = array_map(fn($artist) => $artist->name, $item->track->artists);
+        $artists = join(', ', $artists);
+        $temp = sprintf("<a href=\"%s\"><b>%d.</b> %s – %s</a>\n", $item->track->external_urls->spotify, $key + 1, $artists, $item->track->name);
+        $result .= $temp;
+    }
 
     $bot->sendMessage(
         $message->getChat()->getId(),
-        $trackUrl
+        $result,
+        'HTML',
+        true
     );
 });
 
@@ -46,4 +56,10 @@ $client->on(function (Update $update) use ($bot) {
     return true;
 });
 
-$client->run();
+try {
+    $client->run();
+} catch (\TelegramBot\Api\InvalidJsonException $e) {
+    $client->on(function (Update $update) use ($bot) {
+       $bot->sendMessage($update->getMessage()->getChat()->getId(), 'Sorry, this bot currently unavailable');
+    });
+}
