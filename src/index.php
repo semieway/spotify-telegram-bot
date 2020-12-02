@@ -98,6 +98,22 @@ try {
        );
     });
 
+    $genres = ['rock', 'indie', 'jazz', 'pop', 'classical', 'blues', 'country', 'soul', 'hip hop', 'metal', 'electronic'];
+    /* /randomsong command */
+    $client->command('randomsong', function(Message $message) use ($bot, $spotifyApi, $genres) {
+        $song = $spotifyApi->getRecommendations([
+            'limit' => 1,
+            'seed_genres' => [$genres[array_rand($genres, 1)]],
+            'min_popularity' => 50,
+        ]);
+        $songLink = $song->tracks[0]->external_urls->spotify;
+
+        $bot->sendMessage(
+            $message->getChat()->getId(),
+            $songLink
+        );
+    });
+
     /* /start command */
     $client->command('start', function (Message $message) use ($bot) {
         $bot->sendMessage(
