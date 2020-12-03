@@ -78,9 +78,14 @@ try {
         );
     });
 
-    /* /newreleases command */
+    /* /newreleases | optional country code command */
     $client->command('newreleases', function (Message $message) use ($bot, $spotifyApi) {
-       $releases = $spotifyApi->getNewReleases(['country' => 'US', 'limit' => 10]);
+       if (strlen($message->getText()) > 12) {
+           $countryCode = substr($message->getText(), 13);
+       } else {
+           $countryCode = 'US';
+       }
+       $releases = $spotifyApi->getNewReleases(['country' => $countryCode, 'limit' => 10]);
        $result = "<b>Latest releases:</b>\n";
 
        foreach ($releases->albums->items as $release) {
@@ -99,11 +104,17 @@ try {
     });
 
     $genres = ['rock', 'indie', 'jazz', 'pop', 'classical', 'blues', 'country', 'soul', 'hip hop', 'metal', 'electronic'];
-    /* /randomsong command */
+    /* /randomsong | optional genre command */
     $client->command('randomsong', function(Message $message) use ($bot, $spotifyApi, $genres) {
+        if (strlen($message->getText()) > 11) {
+            $genre = substr($message->getText(), 12);
+        } else {
+            $genre = $genres[array_rand($genres, 1)];
+        }
+
         $song = $spotifyApi->getRecommendations([
             'limit' => 1,
-            'seed_genres' => [$genres[array_rand($genres, 1)]],
+            'seed_genres' => [$genre],
             'min_popularity' => 50,
         ]);
         $songLink = $song->tracks[0]->external_urls->spotify;
@@ -114,11 +125,17 @@ try {
         );
     });
 
-    /* /randomalbum command */
+    /* /randomalbum | optional genre command */
     $client->command('randomalbum', function (Message $message) use ($bot, $spotifyApi, $genres) {
+        if (strlen($message->getText()) > 12) {
+            $genre = substr($message->getText(), 13);
+        } else {
+            $genre = $genres[array_rand($genres, 1)];
+        }
+
        $album = $spotifyApi->getRecommendations([
            'limit' => 1,
-           'seed_genres' => [$genres[array_rand($genres, 1)]],
+           'seed_genres' => [$genre],
            'min_popularity' => 50,
        ]);
        $albumLink = $album->tracks[0]->album->external_urls->spotify;
