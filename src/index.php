@@ -146,6 +146,16 @@ try {
         );
     });
 
+    /* /genres command */
+    $client->command('genres', function (Message $message) use ($bot, $spotifyApi) {
+       $genres = $spotifyApi->getGenreSeeds()->genres;
+
+       $bot->sendMessage(
+           $message->getChat()->getId(),
+           join(', ', $genres)
+       );
+    });
+
     /* /start command */
     $client->command('start', function (Message $message) use ($bot) {
         $bot->sendMessage(
