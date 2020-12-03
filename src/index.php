@@ -103,12 +103,12 @@ try {
        );
     });
 
-    $genres = ['rock', 'indie', 'jazz', 'pop', 'classical', 'blues', 'country', 'soul', 'hip hop', 'metal', 'electronic'];
     /* /randomsong | optional genre command */
-    $client->command('randomsong', function(Message $message) use ($bot, $spotifyApi, $genres) {
+    $client->command('randomsong', function(Message $message) use ($bot, $spotifyApi) {
         if (strlen($message->getText()) > 11) {
             $genre = substr($message->getText(), 12);
         } else {
+            $genres = $spotifyApi->getGenreSeeds()->genres;
             $genre = $genres[array_rand($genres, 1)];
         }
 
@@ -126,10 +126,11 @@ try {
     });
 
     /* /randomalbum | optional genre command */
-    $client->command('randomalbum', function (Message $message) use ($bot, $spotifyApi, $genres) {
+    $client->command('randomalbum', function (Message $message) use ($bot, $spotifyApi) {
         if (strlen($message->getText()) > 12) {
             $genre = substr($message->getText(), 13);
         } else {
+            $genres = $spotifyApi->getGenreSeeds()->genres;
             $genre = $genres[array_rand($genres, 1)];
         }
 
